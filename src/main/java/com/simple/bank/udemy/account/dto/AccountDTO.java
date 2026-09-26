@@ -33,6 +33,7 @@ public class AccountDTO {
 
     @JsonBackReference
     private UserDTO user;
+
     private Currency currency;
     private AccountStatus status;
 

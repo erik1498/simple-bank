@@ -40,6 +40,7 @@ public class AccountServiceImpl implements AccountService
         AccountEntity account = AccountEntity.builder()
                 .accountNumber(accountNumber)
                 .accountType(accountType)
+                .status(AccountStatus.ACTIVE)
                 .currency(Currency.USD)
                 .balance(BigDecimal.ZERO)
                 .user(userEntity)
