@@ -1,5 +1,5 @@
 #Stage 1 : build the application
-FROM eclipse-temurin:21-jdk-jammy AS builder
+FROM eclipse-temurin:25-jdk-jammy AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -22,7 +22,7 @@ RUN mvn clean package -DskipTests
 
 #Stage 2 : build a production ready image and run
 # set up the runtime environtment
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:25-jre-jammy
 
 WORKDIR /app
 
