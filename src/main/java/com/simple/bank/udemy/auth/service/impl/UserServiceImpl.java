@@ -5,6 +5,7 @@ import com.simple.bank.udemy.auth.dto.UserDTO;
 import com.simple.bank.udemy.auth.entity.UserEntity;
 import com.simple.bank.udemy.auth.repository.UserRepository;
 import com.simple.bank.udemy.auth.service.UserService;
+import com.simple.bank.udemy.aws.S3Service;
 import com.simple.bank.udemy.exception.BadRequestException;
 import com.simple.bank.udemy.exception.NotFoundException;
 import com.simple.bank.udemy.notification.dto.NotificationDTO;
@@ -41,6 +42,8 @@ public class UserServiceImpl implements UserService
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
+
+    private final S3Service s3Service;
 
     @Override
     public UserEntity getCurrentLoggedInUser() {
@@ -119,7 +122,8 @@ public class UserServiceImpl implements UserService
 
     @Override
     public Response<?> uploadProfilePicture(MultipartFile file) {
-        String uploadProfilePicture = "uploads/profile-pictures/";
+//        String uploadProfilePicture = "uploads/profile-pictures/";
+        String uploadProfilePicture = "/home/erickhene/Documents/SERTIFIKASI/UDEMY FINTECH/simple-bank-react/public/profile-picture";
 
         UserEntity user = getCurrentLoggedInUser();
 
@@ -149,7 +153,8 @@ public class UserServiceImpl implements UserService
 
             Files.copy(file.getInputStream(), filePath);
 
-            String fileUrl = uploadProfilePicture + newFileName;
+//            String fileUrl = uploadProfilePicture + newFileName;
+            String fileUrl = "profile-picture/" + newFileName;
 
             user.setProfilePictureUrl(fileUrl);
             userRepository.save(user);
@@ -160,6 +165,30 @@ public class UserServiceImpl implements UserService
                     .data(fileUrl)
                     .build();
 
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Response<?> uploadProfilePictureToS3(MultipartFile file) {
+        UserEntity user = getCurrentLoggedInUser();
+
+        try {
+            if (user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
+                s3Service.deleteFile(user.getProfilePictureUrl());
+            }
+
+            String s3Url = s3Service.uploadFile(file, "profile-pictures");
+
+            user.setProfilePictureUrl(s3Url);
+            userRepository.save(user);
+
+            return Response.builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message("Profile picture uploaded successfully.")
+                    .data(s3Url)
+                    .build();
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }

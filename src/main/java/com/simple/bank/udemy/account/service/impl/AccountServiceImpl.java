@@ -59,6 +59,7 @@ public class AccountServiceImpl implements AccountService
                 .toList();
 
         return Response.<List<AccountDTO>>builder()
+                .statusCode(HttpStatus.OK.value())
                 .message("User accounts fetched successfully")
                 .data(accountDTOS)
                 .build();

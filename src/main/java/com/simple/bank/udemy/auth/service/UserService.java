@@ -13,4 +13,5 @@ public interface UserService {
     Response<Page<UserDTO>> getAllUsers(int page, int size);
     Response<?> updatePassword(UpdatePasswordRequestDTO updatePasswordRequestDTO);
     Response<?> uploadProfilePicture(MultipartFile file);
+    Response<?> uploadProfilePictureToS3(MultipartFile file);
 }
