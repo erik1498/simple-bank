@@ -8,15 +8,20 @@ WORKDIR /app
 # Update package list and install Maven without recommended packages to keep the layer small
 RUN apt-get update && apt-get install -y --no-install-recommends maven && rm -rf /var/lib/apt/lists/*
 
+# Copy the Project Object Model (POM) file from the host to the container's WORKDIR (/app)
 COPY pom.xml .
 
+# Download project dependecies
 RUN mvn dependency:go-offline -B
 
+# Copy the application's source code
 COPY src ./src
 
+# Package the Spring Boot application into a JAR file
 RUN mvn clean package -D maven.text.skip-true
 
 #Stage 2 : build a production ready image and run
+# set up the runtime environtment
 FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
